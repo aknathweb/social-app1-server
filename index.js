@@ -85,6 +85,43 @@ async function run() {
             res.send(post);
         })
 
+        app.get('/comments', async (req, res) => {
+            const query = {};
+            const cursor = commentCollection.find(query);
+            const posts = await cursor.toArray();
+            res.send(posts);
+        })
+        app.post('/post/comment', async (req, res) => {
+            //postId,commenterId,name,email,text,commentTime
+            const comment = req.body;
+            const commentTime = new Date();
+            const result = await commentCollection.insertOne({ ...comment, commentTime: commentTime });
+            res.send(result);
+        })
+        app.get('/comments/:postId', async (req, res) => {
+            const postId = req.params.postId;
+            const query = { postId: postId };
+            const cursor = commentCollection.find(query);
+            const comments = await cursor.toArray();
+            res.send(comments);
+        })
+        app.put('/comment/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) }
+            // liker data update
+            const commentUpdateDate = req.body;
+            console.log(commentUpdateDate);
+            const option = { upsert: true };
+            // set new update data
+            const updatedUserOperation = {
+                $set: {
+                    likes: [...likes, commentUpdateDate.likerId]
+                }
+            }
+            const result = await commentCollection.updateOne(query, updatedUserOperation, option)
+            res.send(result)
+        })
+
     } catch (error) {
 
     }
