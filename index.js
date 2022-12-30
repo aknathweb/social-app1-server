@@ -45,7 +45,24 @@ async function run() {
             const users = await cursor.toArray();
             res.send(users);
         })
-
+        app.put('/user/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) }
+            const userUpdateDate = req.body;
+            console.log(userUpdateDate);
+            const option = { upsert: true };
+            // set new update data
+            const updatedUserOperation = {
+                $set: {
+                    name: userUpdateDate.name,
+                    email: userUpdateDate.email,
+                    university: userUpdateDate.university,
+                    address: userUpdateDate.address
+                }
+            }
+            const result = await userCollection.updateOne(query, updatedUserOperation, option)
+            res.send(result)
+        })
 
 
     } catch (error) {
