@@ -64,6 +64,26 @@ async function run() {
             res.send(result)
         })
 
+        app.post('/post', async (req, res) => {
+            // name,email,text,image,postTime
+            const post = req.body;
+            const postTime = new Date();
+            console.log(post);
+            const result = await postCollection.insertOne({ ...post, postTime: postTime });
+            res.send(result);
+        })
+        app.get('/post', async (req, res) => {
+            const query = {};
+            const cursor = postCollection.find(query);
+            const posts = await cursor.toArray();
+            res.send(posts);
+        })
+        app.get('/post/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const post = await postCollection.findOne(query);
+            res.send(post);
+        })
 
     } catch (error) {
 
